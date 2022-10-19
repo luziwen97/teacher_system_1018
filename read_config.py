@@ -6,6 +6,8 @@ import pymysql
 import sqlalchemy
 import pandas as pd
 
+
+
 def get_config_info():
     #读取congfig文件关于数据库的连接设置
     conf = configparser.ConfigParser()  # 类的实例化
@@ -21,6 +23,7 @@ def get_config_info():
     database = str(conf.get(selection[0], "database"))
     charset = str(conf.get(selection[0], "charset"))
     return host,port,user,password,database,charset
+host, port, user, password, database, charset= get_config_info()
 def con():
     #连接数据库
     host, port, user, password, database, charset=get_config_info()
@@ -32,6 +35,7 @@ def con():
         database=database,  # 库名
         charset=charset  # 编码方式
     )
+    print("数据库连接成功！")
     return connect
 
 def get_table_names():
@@ -41,7 +45,8 @@ def get_table_names():
     consor=con().cursor()
     print("表格名获取中")
     table_names=[]
-    sql_1 = "select table_name from information_schema.tables where table_schema='teacher_db' and table_type = 'BASE TABLE' AND table_schema = DATABASE ()";
+    sql_1 = "select table_name from information_schema.tables where table_schema="+"'"+str(database)+"'"+" and table_type = 'BASE TABLE' AND table_schema = DATABASE ()";
+    print(sql_1)
     consor.execute(sql_1)
     result = consor.fetchall()
     for i in result:
@@ -61,7 +66,10 @@ def get_columns_names(text):
 def create_table(df,df_name):
     #传入df表然后设定表名在数据库中创建数据表
     try:
-        yconnect  = sqlalchemy.create_engine('mysql+pymysql://root:123456@localhost/teacher_db?charset=utf8')
+        sql_11="mysql+pymysql://"+str(user)+":"+str(password)+"@"+str(host)+"/"+str(database)+"?charset="+str(charset)
+        print(sql_11)
+        yconnect = sqlalchemy.create_engine(sql_11)
+        #yconnect  = sqlalchemy.create_engine('mysql+pymysql://root:12345678@localhost/teacher_db?charset=utf8')
         df.to_sql(str(df_name),yconnect,index=False,if_exists='replace')
     except Exception as reason:
         print(reason)
@@ -69,7 +77,11 @@ def create_table(df,df_name):
 def get_table(table_name):
     #根据数据表名获取df表
     sql_4 = "SELECT * FROM " + str(table_name) + ";"
-    yconnect = sqlalchemy.create_engine('mysql+pymysql://root:123456@localhost/teacher_db?charset=utf8')
+    sql_11 = "mysql+pymysql://" + str(user) + ":" + str(password) + "@" + str(host) + "/" + str(
+        database) + "?charset=" + str(charset)
+    print(sql_11)
+    yconnect = sqlalchemy.create_engine(sql_11)
+    #yconnect = sqlalchemy.create_engine('mysql+pymysql://root:12345678@localhost/teacher_db?charset=utf8')
     df = pd.read_sql(str(sql_4), con=yconnect)
     return df
 
@@ -130,13 +142,16 @@ def get_cow(table_name,column_name):
     #根据表名，列名，获取列中所有值
     #根据列名和表名获取列的所有记录值
     sql_6="select "+str(column_name)+" FROM "+str(table_name)+";"
-    yconnect = sqlalchemy.create_engine('mysql+pymysql://root:123456@localhost/teacher_db?charset=utf8')
+    sql_11 = "mysql+pymysql://" + str(user) + ":" + str(password) + "@" + str(host) + "/" + str(
+        database) + "?charset=" + str(charset)
+    print(sql_11)
+    yconnect = sqlalchemy.create_engine(sql_11)
+    #yconnect = sqlalchemy.create_engine('mysql+pymysql://root:12345678@localhost/teacher_db?charset=utf8')
     df = pd.read_sql(str(sql_6), con=yconnect)
     cow_values=df[column_name].to_list()
     return cow_values
 def get_id(table_name,value):
     consor = con().cursor()
-
     sql_10="SELECT `教师ID` FROM " +str(table_name)+" WHERE 姓名="+"'"+str(value)+"'"+";"
     print(sql_10)
     consor.execute(sql_10)

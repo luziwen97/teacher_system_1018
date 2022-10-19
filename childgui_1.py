@@ -3,15 +3,12 @@
 数据库的增删改查操作
 '''
 from PyQt5.QtCore import *
-import pymysql
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import *
 import os
 import pandas as pd
 from PyQt5.QtWidgets import QMessageBox
 import read_config
-
-
 
 class Ui_Dialog_1(object):
     def __init__(self):
@@ -714,7 +711,9 @@ class Ui_Dialog_1(object):
             self.comboBox_2.clear()
             self.comboBox_3.clear()
             self.comboBox_5.clear()
-            self.comboBox_6.clear()
+            #self.comboBox_6.clear()
+            self.comboBox_8.clear()
+            self.comboBox_7.clear()
             model = PdTable(pd.DataFrame([]))
             self.tableView_1.setModel(model)
             self.tableView_2.setModel(model)
