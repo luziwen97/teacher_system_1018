@@ -12,9 +12,9 @@ from PyQt5.QtWidgets import *
 
 
 
-class Ui_Dialog_2(object):
-    def __init__(self):
-        pass
+class Ui_Dialog_2(QWidget):
+    def __init__(self, *args, **kwargs):
+        super(Ui_Dialog_2, self).__init__(*args, **kwargs)
 
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
@@ -103,6 +103,7 @@ class Ui_Dialog_2(object):
         A = A[1:]
         for i in A:
             self.comboBox_5.addItem(str(i))
+
     def combobox_1(self,text):
         self.comboBox_2.clear()
         columns_name=read_config.get_columns_names(text)

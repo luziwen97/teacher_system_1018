@@ -11,7 +11,8 @@ import pandas as pd
 import read_setting
 from childgui_1 import Ui_Dialog_1
 from childgui_2 import Ui_Dialog_2
-
+from childgui_2_copy import Ui_Dialog_2 as ui2
+from CDrawer import CDrawer
 import os
 
 class childWindow_1(QDialog):
@@ -30,7 +31,31 @@ class childWindow_2(QDialog):
         self.child = Ui_Dialog_2()
         self.child.setupUi(self)
 
+class DrawerWidget(QWidget):
 
+    def __init__(self, *args, **kwargs):
+        super(DrawerWidget, self).__init__(*args, **kwargs)
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setStyleSheet('DrawerWidget{background:white;}')
+        self.lineedit = QLineEdit(self)
+
+
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.lineedit)
+        layout.addWidget(QPushButton('button', self,clicked=self._click))
+        layout.addWidget(QPushButton('button2', self, clicked=self._click2))
+
+
+
+    def _click(self):
+        if self.lineedit.text() != "":
+            print("框中输入的文字为:{}".format(self.lineedit.text()))
+            self.lineedit.clear()
+        else:
+            print("框中未输入的文字为")
+
+    def _click2(self):
+        print("没用")
 
 class PdTable(QAbstractTableModel):
     # 显示df的table_view，主界面下方表格
@@ -224,9 +249,14 @@ class Ui_MainWindow(object):
 
     def childShow2(self):
         # 调出键值对关系
-        child_window = childWindow_2()
-        child_window.exec_()
-        self.btn_4()
+        if not hasattr(self, 'leftDrawer'):
+            self.leftDrawer = CDrawer(self, direction=CDrawer.LEFT)
+            self.leftDrawer.setWidget(ui2(self.leftDrawer))
+        self.leftDrawer.show()
+
+        #child_window = childWindow_2()
+        #child_window.exec_()
+        #self.btn_4()
         # 查看表格关系键对
     def btn_2(self):
         #调出数据新增界面

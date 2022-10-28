@@ -15,10 +15,13 @@ from PyQt5.QtWidgets import *
 from CDrawer import CDrawer
 import sys
 import cgitb
-sys.excepthook = cgitb.enable(1, None, 5, '')
+
+sys.excepthook = cgitb.enable(1, None, 5, '')           #？
+
+
 from PyQt5.QtWidgets import QApplication
 
-
+#这是侧边栏的布局及
 class DrawerWidget(QWidget):
 
     def __init__(self, *args, **kwargs):
@@ -48,7 +51,7 @@ class DrawerWidget(QWidget):
 
 
 
-
+#主界面
 class Window(QWidget):
     def __init__(self, *args, **kwargs):
         super(Window, self).__init__(*args, **kwargs)
@@ -62,6 +65,7 @@ class Window(QWidget):
         # layout.addWidget(QPushButton('侧边栏', self, clicked=self.doOpenLeft), 1, 0)
 
     def mouseMoveEvent(self, event):
+        #监控鼠标位置，如果鼠标位置在左侧小于100则打开左侧侧边栏
         print("-----------------------mouseMoveEvent-----------------------")
         if self.entermouse == 1:
             self.x = event.x()
@@ -73,6 +77,7 @@ class Window(QWidget):
 
 
     def mousePressEvent(self, event):
+        #鼠标按压监控
         if self.entermouse == 1 and self.flag == 1 and event.button() == Qt.LeftButton:
             self.x = event.x()
             self.y = event.y()
@@ -85,6 +90,7 @@ class Window(QWidget):
 
 
     def mouseReleaseEvent(self, event):
+        #鼠标按压释放监控
         if self.entermouse == 1 and self.flag == 1 and event.button() == Qt.LeftButton:
             self.x = event.x()
             self.y = event.y()

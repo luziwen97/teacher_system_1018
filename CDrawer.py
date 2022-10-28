@@ -16,7 +16,7 @@ class CDrawer(QWidget):
 
     LEFT, TOP, RIGHT, BOTTOM = range(4)
 
-    def __init__(self, *args, stretch=1 / 3, direction=0, widget=None, **kwargs):
+    def __init__(self, *args, stretch=1 / 5, direction=0, widget=None, **kwargs):
         super(CDrawer, self).__init__(*args, **kwargs)
         self.setWindowFlags(self.windowFlags(
         ) | Qt.FramelessWindowHint | Qt.Popup | Qt.NoDropShadowWindowHint)
