@@ -162,6 +162,8 @@ class Ui_Dialog_1(object):
         self.pv = 0
         self.pgb.setValue(self.pv)
 
+
+
         #===================================GUI文本设置及控件逻辑连接=================
         self.button_1.setText("读取新的数据表")
         self.button_2.setText("添加")
@@ -173,6 +175,7 @@ class Ui_Dialog_1(object):
         self.button_8.setText("选择数据表及连接数据库")
         self.button_9.setText("进行ID匹配")
 
+
         self.label_1.setText("选择sheet:")
         self.label_2.setText("公共键:")
         self.label_3.setText("选择字段:")
@@ -182,6 +185,7 @@ class Ui_Dialog_1(object):
         self.label_7.setText("次主键:")
         self.label_8.setText("选择进行匹配的表:")
         self.label_9.setText("选择进行匹配的数据库:")
+
 
         self.label_1.setFrameShape(QtWidgets.QFrame.Box)
         self.label_1.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -217,6 +221,7 @@ class Ui_Dialog_1(object):
         self.button_9.clicked.connect(self.btn_9)
         self.listWidget_1.itemClicked.connect(self.listwidget_1)
         for i in self.data_types:
+
             self.comboBox_4.addItem(i)
 
             #==============================以下是控件逻辑代码===============================
@@ -749,11 +754,7 @@ class Ui_Dialog_1(object):
 
     def listwidget_1(self, item):
 
-
-
-
         try:
-
             self.msg = QMessageBox()
             self.msg.setStandardButtons(self.msg.Yes | self.msg.No)
             self.msg.setIcon(self.msg.Question)
@@ -787,6 +788,7 @@ class Ui_Dialog_1(object):
             QMessageBox.information(None,"提示","导入成功")
         elif a== "No":
             print("你选择了No")
+
 
     def teacher_excel_add_id(self,df):
         column_list=df.columns.to_list()
@@ -828,6 +830,7 @@ class Ui_Dialog_1(object):
         return df
 
     def btn_8(self):
+        #选择数据表和连接数据库
         fileName, filetype = QFileDialog.getOpenFileName(None,
                                                         "选取文件",
                                                         self.cwd,  # 起始路径
@@ -838,12 +841,13 @@ class Ui_Dialog_1(object):
         if filetype:
             df = pd.read_excel(str(fileName), sheet_name=None)
             self.label_5.setText(str(fileName))
+            self.comboBox_7.clear()
             for i in df.keys():
                 self.comboBox_7.addItem(str(i))
-
         try:
             self.comboBox_8.clear()
             self.tablenames = read_config.get_table_names()
+
             print(self.tablenames)
             for i in self.tablenames:
                 self.comboBox_8.addItem(str(i))
@@ -879,12 +883,14 @@ class Ui_Dialog_1(object):
     def btn_9(self):
         #进行表格及数据库id匹配
         try:
-            df = pd.read_excel(str(self.label_5.text()), sheet_name=self.comboBox_7.currentText())
-            df_columns_list=df.columns.to_list()
-            teacher_name_list=df['姓名'].to_list()
+            df = pd.read_excel(str(self.label_5.text()), sheet_name=self.comboBox_7.currentText())      #读取选取的数据表
+            df_columns_list=df.columns.to_list()                        #存储列名
+            teacher_name_list=df['姓名'].to_list()                       #将姓名列都列举出来
+
             new_list1=[] #用于存储无重复的所有姓名
             new_list2=[]   #用于存储有重复的所有姓名
-            name_list=[]
+            name_list=[]    #储存去除重复姓名后余下的姓名
+
             for i in teacher_name_list:
                 if i not in new_list1:
                     new_list1.append(i)
@@ -898,34 +904,48 @@ class Ui_Dialog_1(object):
 
             for i in new_list2:
                 name_list.remove(i)
-            print(new_list1)
-            print(new_list2)
-            print(name_list)
+
+
+
+            #如果表格列中没有教师ID列，则插入教师ID列
             if "教师ID" not in df_columns_list:
                 df['教师ID']=None
-            print(df)
 
+            #读取数据库表
             sql_df=read_config.get_table(self.comboBox_8.currentText())
-            print(sql_df)
-            sql_name_list=sql_df['姓名'].to_list()
-            sql_list1, sql_list2, sql_name_list=self.remove_repeat(sql_name_list)
-            print(sql_list1)
-            print(sql_list2)
-            print(sql_name_list)
+            sql_name_list=sql_df['姓名'].to_list()            #将数据库内姓名列举出来
 
-            print(3)
+
+            sql_list1, sql_list2, sql_name_list=self.remove_repeat(sql_name_list)
+            #sql_list1是全部姓名
+            #sql_list2是发生重名的全部姓名
+            #sql_name_list是去除重名后余下的姓名列表
+
+            #调用remove_repeat方法去除重复
+
+            #依次读取姓名列，如果姓名在去除重复后的姓名列表中，且选择的数据库中有该姓名则会进行ID匹配然后添加
+
+            '''
+            姓名匹配逻辑：
+            1.对于教师的新增默认是不需要进行数据匹配的，因为教师不重复的，故教师ID列为自增函数，只要有新增的都会进行自动匹配教师ID
+            2.对于包含动作类表格的数据匹配逻辑，只要是包含姓名的，都可以与数据库内教师表进行数据匹配，会自动将教师ID匹配上，其余教师ID需要自行进行填充
+            3.不包含教师姓名的表，请直接进行数据表的更新或者新增
+            '''
+
             for i in range(len(df)):
                 name=df['姓名'][i]
-                print(name)
-                if name in name_list:
-                    if name in sql_name_list:
+                if name in sql_name_list:
                         id=read_config.get_id(self.comboBox_8.currentText(),name)
+                        print(name)
+                        print(id)
                         df['教师ID'][i]=id
-            print(df)
-
+            #在原始表中新填加一张表，包含了教师ID，存储在原来的表格里
             self.write(file_path=str(self.label_5.text()), sheet_name=str(self.comboBox_7.currentText()+"new"), df_name=df)
+            QMessageBox.information(None,"提示","教师ID匹配已经完成")
+
         except Exception as reason:
-            print("进行id匹配出错的原因%s"%reason)
+            QMessageBox.information(None, "错误提示", "进行id匹配出错的原因%s"%reason)
+
 
 
         pass
@@ -952,6 +972,7 @@ class Ui_Dialog_1(object):
         for i in new_list2:
             name_list.remove(i)
         return new_list1,new_list2,name_list
+
 #显示df的table_view，主界面下方表格
 class PdTable(QAbstractTableModel):
     def __init__(self, data):
@@ -964,6 +985,7 @@ class PdTable(QAbstractTableModel):
             if role == Qt.DisplayRole:
                 return str(self._data.iloc[index.row(), index.column()])
         return None
+
     def rowCount(self, parent=None):
         #获取行
         return self._data.shape[0]
@@ -975,6 +997,10 @@ class PdTable(QAbstractTableModel):
     def headerData(self,col, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return self._data.columns[col]
+        elif orientation == Qt.Vertical and role == Qt.DisplayRole:
+            return self._data.axes[0][col]
         return None
+
+
 
 

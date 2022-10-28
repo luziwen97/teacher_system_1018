@@ -12,6 +12,7 @@ class MyMainWindow(QtWidgets.QMainWindow,Ui_MainWindow):#QWidget是因为创建�
 
 
 
+
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     main = MyMainWindow()

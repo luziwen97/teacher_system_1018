@@ -70,19 +70,60 @@ class Ui_MainWindow(object):
         self.password=None
         self.database=None
         self.charset=None
-
         self.df_list=[]
         self.chose_tabel=[]
         self.main_table="教师"
-
         self.df_ok=None
-
-
 
     def setupUi(self, MainWindow):
         #ui设置
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1445, 913)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 23))
+        self.menubar.setObjectName("menubar")
+
+        # 向菜单栏中添加新的QMenu对象，父菜单
+        file = self.menubar.addMenu('File')
+        add_data = self.menubar.addMenu('新增数据')
+        check_keys = self.menubar.addMenu('查看键值对')
+
+        self.addWinAction = QtWidgets.QAction(MainWindow)
+        self.addWinAction.setObjectName("addWinAction")
+        self.addWinAction2 = QtWidgets.QAction(MainWindow)
+        self.addWinAction2.setObjectName("addWinAction2")
+
+        self.toolBar = QtWidgets.QToolBar(MainWindow)
+        self.toolBar.setObjectName("toolBar")
+
+        self.toolBar.setGeometry(QtCore.QRect(0, 20, 801, 31))
+        MainWindow.addToolBar(self.toolBar)
+        self.toolBar.addAction(self.addWinAction)
+        self.toolBar.addAction(self.addWinAction2)
+        #self.addWinAction.triggered.connect(self.childShow)
+
+        # 向QMenu小控件中添加按钮，子菜单
+        file.addAction('New')
+        add_data.addAction('New')
+        check_keys.addAction('New')
+        # 定义响应小控件按钮，并设置快捷键关联到操作按钮，添加到父菜单下
+        save = QAction('Save', self.menubar)
+        save.setShortcut('Ctrl+S')
+        file.addAction(save)
+
+        # 创建新的子菜单项，并添加孙菜单
+        edit = file.addMenu('Edit')
+        edit.addAction('Copy')
+        edit.addAction('Paste')
+
+        # 添加父菜单下
+        quit = QAction('Quit', self.menubar)
+        file.addAction(quit)
+
+        # 单击任何Qmenu对象，都会发射信号，绑定槽函数
+        file.triggered[QAction].connect(self.processtrigger)
+
+
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -134,10 +175,13 @@ class Ui_MainWindow(object):
         self.tableView.setObjectName("表格显示窗口")
 
         MainWindow.setCentralWidget(self.centralwidget)
+        #菜单栏
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1445, 26))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
+
+        #状态栏
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
@@ -147,9 +191,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         #ui控件逻辑关联
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-
-
+        MainWindow.setWindowTitle(_translate("MainWindow", "教师信息系统"))
         self.button_2.setText(_translate("MainWindow", "数据新增"))
         self.button_3.setText(_translate("MainWindow", "查看表格关系键对"))
         self.button_4.setText(_translate("MainWindow", "刷新数据及键值对"))
@@ -165,11 +207,27 @@ class Ui_MainWindow(object):
         self.button_6.clicked.connect(self.btn_6)
         self.comboBox_1.activated[str].connect(self.combox_1)
         self.listWidget_1.itemClicked.connect(self.listwidget_1)
+        self.addWinAction.setText(_translate("MainWindow", "新增数据"))
+        self.addWinAction2.setText(_translate("MainWindow", "查看键值对"))
+        self.addWinAction.setToolTip(_translate("MainWindow", "addwin"))
+        self.addWinAction2.setToolTip(_translate("MainWindow", "addwin"))
+        self.addWinAction.triggered.connect(self.childShow)
+        self.addWinAction2.triggered.connect(self.childShow2)
+    def processtrigger(self, q):
+        # 输出那个Qmenu对象被点击
+        print(q.text() + 'is triggeres')
 
+    def childShow(self):
+        # 调出数据新增界面
+        child_window = childWindow_1()
+        child_window.exec_()
 
-
-
-
+    def childShow2(self):
+        # 调出键值对关系
+        child_window = childWindow_2()
+        child_window.exec_()
+        self.btn_4()
+        # 查看表格关系键对
     def btn_2(self):
         #调出数据新增界面
         child_window = childWindow_1()
@@ -204,8 +262,7 @@ class Ui_MainWindow(object):
             self.relation_ship_keys_list = list(self.relation_ship.keys())
             self.relation_ship_values_list = list(self.relation_ship.values())
         except Exception as reason:
-            print("btn_5问题原因%s" % reason)
-
+            QMessageBox.information(None, "错误提示", "btn_5问题原因%s" % reason)
 
 
     def btn_5(self):
@@ -225,7 +282,8 @@ class Ui_MainWindow(object):
                 QMessageBox.information(None, "提示", "没有保存数据,请重新保存。")  # 调用弹窗提示
                 return fileName_save[0]
         except Exception as reason:
-            print("btn_5问题原因%s"%reason)
+            QMessageBox.information(None, "错误提示", "btn_5问题原因%s"%reason)
+
 
 
 
